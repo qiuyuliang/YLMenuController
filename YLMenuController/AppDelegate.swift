@@ -12,14 +12,49 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    var accountManager: AccountManager?
+    var menuController: YLMenuController?
+    var currentRootController: UINavigationController?
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
         // Override point for customization after application launch.
+        self.accountManager = AccountManager(
+            loginCallback: {
+                self.applicationFramework()
+            },
+            logoutCallback: {
+                self.showLoginViewController()
+        })
+//        self.accountManager!.login()
+        self.accountManager!.logout()
+        self.applicationTheme()
         self.window!.backgroundColor = UIColor.whiteColor()
         self.window!.makeKeyAndVisible()
         return true
+    }
+    
+    func applicationFramework() {
+        var mainController = MainViewController()
+        var leftController = LeftViewController()
+        var rightController = RightViewController()
+        self.menuController = YLMenuController(rootViewController: mainController)
+        self.menuController!.leftViewController = leftController
+        self.menuController!.rightViewController = rightController
+        self.currentRootController = UINavigationController(rootViewController: self.menuController!)
+        self.window!.rootViewController = self.currentRootController
+    }
+    
+    func applicationTheme() {
+        UINavigationBar.appearance().barTintColor = RGBACOLOR(45, 142, 223, 1)
+        UIApplication.sharedApplication().statusBarStyle = UIStatusBarStyle.LightContent;
+        UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor()]
+        UINavigationBar.appearance().tintColor = UIColor.whiteColor()
+    }
+    
+    func showLoginViewController() {
+        var loginViewController = LoginViewController()
+        self.window!.rootViewController = loginViewController
     }
 
     func applicationWillResignActive(application: UIApplication) {
